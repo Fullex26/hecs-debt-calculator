@@ -1,50 +1,98 @@
-# React + TypeScript + Vite
+# HECS Debt Calculator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, interactive web application that helps Australian students and graduates calculate their HECS-HELP loan repayments and visualize their debt repayment journey.
 
-Currently, two official plugins are available:
+![HECS Debt Calculator Screenshot](screenshot.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- 📊 Interactive debt repayment calculator
+- 📈 Visual repayment projections with detailed charts
+- 💰 Accurate repayment thresholds for 2024-25
+- 📅 Timeline of repayment milestones
+- 💸 Voluntary repayment planning
+- 📱 Fully responsive design for all devices
+- 🎯 Advanced options for salary growth projections
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Live Demo
 
-- Configure the top-level `parserOptions` property like this:
+[View Live Demo](#) <!-- Add your deployment URL here -->
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Technology Stack
+
+- React 18
+- TypeScript
+- Vite
+- Mantine UI
+- Recharts
+- Tabler Icons
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/hecs-debt-calculator.git
+cd hecs-debt-calculator
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+2. Install dependencies
+```bash
+npm install
+# or
+yarn install
 ```
+
+3. Start the development server
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+4. Open your browser and visit `http://localhost:5173`
+
+## Building for Production
+
+To create a production build:
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+The built files will be in the `dist` directory.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Mantine UI](https://mantine.dev/) for the beautiful component library
+- [Recharts](https://recharts.org/) for the charting library
+- [Tabler Icons](https://tabler-icons.io/) for the icon set
+- Australian Taxation Office for the HECS-HELP repayment thresholds data
+
+## Contact
+
+Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
+
+Project Link: [https://github.com/yourusername/hecs-debt-calculator](https://github.com/yourusername/hecs-debt-calculator)
