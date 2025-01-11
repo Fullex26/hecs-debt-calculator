@@ -129,6 +129,12 @@ const RepaymentThresholdTooltip = () => (
   </Box>
 );
 
+interface FormValues {
+  currentDebt: string;
+  annualIncome: string;
+  expectedSalaryIncrease: number;
+}
+
 export function HECSCalculator() {
   const isMobile = useMediaQuery('(max-width: 480px)');
   const { height } = useViewportSize();
@@ -137,21 +143,23 @@ export function HECSCalculator() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [chartAnimated, setChartAnimated] = useState(false);
 
-  const form = useForm({
+  const form = useForm<FormValues>({
     initialValues: {
-      currentDebt: 0,
-      annualIncome: 0,
+      currentDebt: '',
+      annualIncome: '',
       expectedSalaryIncrease: 3,
     },
     validate: {
       currentDebt: (value) => {
-        if (value < 0) return 'Debt cannot be negative';
-        if (value > 1000000) return 'Please enter a value less than $1,000,000';
+        const numValue = Number(value);
+        if (value && (isNaN(numValue) || numValue < 0)) return 'Debt cannot be negative';
+        if (numValue > 1000000) return 'Please enter a value less than $1,000,000';
         return null;
       },
       annualIncome: (value) => {
-        if (value < 0) return 'Income cannot be negative';
-        if (value > 1000000) return 'Please enter a value less than $1,000,000';
+        const numValue = Number(value);
+        if (value && (isNaN(numValue) || numValue < 0)) return 'Income cannot be negative';
+        if (numValue > 1000000) return 'Please enter a value less than $1,000,000';
         return null;
       },
       expectedSalaryIncrease: (value) => {
@@ -187,7 +195,14 @@ export function HECSCalculator() {
   const calculateRepayment = (income: number): CalculationResult => {
     const yearlyData: YearlyData[] = [];
     const projectionMilestones: ProjectionMilestone[] = [];
-    let remainingDebt = form.values.currentDebt;
+    
+    // Convert all initial values to numbers
+    const currentDebtValue = Number(form.values.currentDebt) || 0;
+    const salaryIncrease = Number(form.values.expectedSalaryIncrease);
+    const indexationRate = Number(INDEXATION_RATE);
+    
+    // Initialize calculation variables
+    let remainingDebt = currentDebtValue;
     let currentIncome = income;
     let years = 0;
     let totalInterestPaid = 0;
@@ -195,7 +210,7 @@ export function HECSCalculator() {
     let quarterPaidYear = 0;
     let halfPaidYear = 0;
     let threeQuartersPaidYear = 0;
-    const initialDebt = form.values.currentDebt;
+    const initialDebt = currentDebtValue;
     const initialRepaymentRate = calculateRepaymentRate(income);
     const initialAnnualRepayment = (income * initialRepaymentRate) / 100;
 
@@ -208,9 +223,12 @@ export function HECSCalculator() {
     });
 
     while (remainingDebt > 0 && years < 50) {
-      const yearlyRepayment = (currentIncome * calculateRepaymentRate(currentIncome)) / 100;
-      const yearlyIndexation = remainingDebt * (INDEXATION_RATE / 100);
+      // Calculate yearly values
+      const repaymentRate = calculateRepaymentRate(currentIncome);
+      const yearlyRepayment = (currentIncome * repaymentRate) / 100;
+      const yearlyIndexation = (remainingDebt * indexationRate) / 100;
       
+      // Update totals
       totalInterestPaid += yearlyIndexation;
       totalRepayments += yearlyRepayment;
 
@@ -250,12 +268,12 @@ export function HECSCalculator() {
         income: currentIncome,
       });
 
-      // Apply indexation
-      remainingDebt *= (1 + INDEXATION_RATE / 100);
-      // Apply salary increase
-      currentIncome *= (1 + form.values.expectedSalaryIncrease / 100);
-      // Subtract repayment
-      remainingDebt -= yearlyRepayment;
+      // Update values for next year
+      const indexationAmount = (remainingDebt * indexationRate) / 100;
+      const salaryIncreaseAmount = (currentIncome * salaryIncrease) / 100;
+      
+      remainingDebt = remainingDebt + indexationAmount - yearlyRepayment;
+      currentIncome = currentIncome + salaryIncreaseAmount;
       years++;
     }
 
@@ -296,9 +314,8 @@ export function HECSCalculator() {
     setChartAnimated(false);
     try {
       await new Promise(resolve => setTimeout(resolve, 600));
-      const calculationResult = calculateRepayment(values.annualIncome);
+      const calculationResult = calculateRepayment(Number(values.annualIncome) || 0);
       setResult(calculationResult);
-      // Trigger chart animation after a small delay
       setTimeout(() => setChartAnimated(true), 100);
     } finally {
       setIsCalculating(false);
