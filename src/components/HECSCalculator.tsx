@@ -2,7 +2,7 @@ import { useForm } from '@mantine/form';
 import { 
   Button, Paper, Title, Stack, NumberInput, Box, Text, Grid, 
   Tooltip, ThemeIcon, Divider, Timeline, LoadingOverlay,
-  Card, Group, Container, ActionIcon, Collapse, Transition
+  Card, Group, Container, ActionIcon, Collapse, Transition, Table
 } from '@mantine/core';
 import { useMediaQuery, useViewportSize } from '@mantine/hooks';
 import { useState } from 'react';
@@ -80,13 +80,61 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   return null;
 };
 
+const REPAYMENT_THRESHOLDS = [
+  { min: 0, max: 54434, rate: 0 },
+  { min: 54435, max: 62850, rate: 1.0 },
+  { min: 62851, max: 66620, rate: 2.0 },
+  { min: 66621, max: 70618, rate: 2.5 },
+  { min: 70619, max: 74855, rate: 3.0 },
+  { min: 74856, max: 79346, rate: 3.5 },
+  { min: 79347, max: 84107, rate: 4.0 },
+  { min: 84108, max: 89154, rate: 4.5 },
+  { min: 89155, max: 94503, rate: 5.0 },
+  { min: 94504, max: 100174, rate: 5.5 },
+  { min: 100175, max: 106185, rate: 6.0 },
+  { min: 106186, max: 112556, rate: 6.5 },
+  { min: 112557, max: 119309, rate: 7.0 },
+  { min: 119310, max: 126467, rate: 7.5 },
+  { min: 126468, max: 134056, rate: 8.0 },
+  { min: 134057, max: 142100, rate: 8.5 },
+  { min: 142101, max: 150626, rate: 9.0 },
+  { min: 150627, max: 159663, rate: 9.5 },
+  { min: 159664, max: Infinity, rate: 10.0 }
+];
+
+const RepaymentThresholdTooltip = () => (
+  <Box p="xs">
+    <Text fw={500} mb="xs">2024-25 Repayment Thresholds</Text>
+    <Table miw={300} layout="fixed">
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>Income Range</Table.Th>
+          <Table.Th>Rate</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>
+        {REPAYMENT_THRESHOLDS.map((threshold, index) => (
+          <Table.Tr key={index}>
+            <Table.Td>
+              {threshold.max === Infinity 
+                ? `$${formatCurrency(threshold.min)} and above`
+                : `$${formatCurrency(threshold.min)} - $${formatCurrency(threshold.max)}`
+              }
+            </Table.Td>
+            <Table.Td>{threshold.rate}%</Table.Td>
+          </Table.Tr>
+        ))}
+      </Table.Tbody>
+    </Table>
+  </Box>
+);
+
 export function HECSCalculator() {
   const isMobile = useMediaQuery('(max-width: 480px)');
   const { height } = useViewportSize();
   const [isCalculating, setIsCalculating] = useState(false);
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  // Add chart animation control
   const [chartAnimated, setChartAnimated] = useState(false);
 
   const form = useForm({
@@ -115,19 +163,24 @@ export function HECSCalculator() {
   });
 
   const calculateRepaymentRate = (income: number): number => {
-    if (income < 51550) return 0;
-    if (income < 57154) return 1.0;
-    if (income < 62764) return 2.0;
-    if (income < 66354) return 2.5;
-    if (income < 69999) return 3.0;
-    if (income < 73999) return 3.5;
-    if (income < 77999) return 4.0;
-    if (income < 82999) return 4.5;
-    if (income < 87999) return 5.0;
-    if (income < 92999) return 5.5;
-    if (income < 97999) return 6.0;
-    if (income < 102999) return 6.5;
-    if (income < 107999) return 7.0;
+    if (income < 54435) return 0;
+    if (income < 62851) return 1.0;
+    if (income < 66621) return 2.0;
+    if (income < 70619) return 2.5;
+    if (income < 74856) return 3.0;
+    if (income < 79347) return 3.5;
+    if (income < 84108) return 4.0;
+    if (income < 89155) return 4.5;
+    if (income < 94504) return 5.0;
+    if (income < 100175) return 5.5;
+    if (income < 106186) return 6.0;
+    if (income < 112557) return 6.5;
+    if (income < 119310) return 7.0;
+    if (income < 126468) return 7.5;
+    if (income < 134057) return 8.0;
+    if (income < 142101) return 8.5;
+    if (income < 150627) return 9.0;
+    if (income < 159664) return 9.5;
     return 10.0;
   };
 
@@ -264,7 +317,7 @@ export function HECSCalculator() {
         <Container size="xl">
           <Stack gap="md">
             {/* Header Section */}
-            <Box style={{ textAlign: 'center' }} pt="md">
+            <Box ta="center" pt="md">
               <ThemeIcon size={isMobile ? 60 : 80} radius={80} mb="md">
                 <IconCalculator size={isMobile ? 30 : 40} stroke={1.5} />
               </ThemeIcon>
@@ -309,7 +362,12 @@ export function HECSCalculator() {
                         label={
                           <Group gap="xs">
                             <Text fw={500} size={isMobile ? 'md' : 'lg'}>Annual Income</Text>
-                            <Tooltip label="Your current annual income before tax">
+                            <Tooltip 
+                              label={<RepaymentThresholdTooltip />}
+                              position="right"
+                              multiline
+                              maw={350}
+                            >
                               <IconInfoCircle size={18} style={{ cursor: 'help' }} />
                             </Tooltip>
                           </Group>
@@ -464,8 +522,8 @@ export function HECSCalculator() {
                                 margin={{ 
                                   top: 20, 
                                   right: 30, 
-                                  left: isMobile ? 10 : 30, 
-                                  bottom: 10 
+                                  left: isMobile ? 20 : 40, 
+                                  bottom: 20 
                                 }}
                               >
                                 <CartesianGrid 
@@ -478,17 +536,18 @@ export function HECSCalculator() {
                                   label={{ 
                                     value: 'Years from Now', 
                                     position: 'insideBottom', 
-                                    offset: -5,
+                                    offset: -10,
                                     fontSize: isMobile ? 12 : 14,
                                     fill: 'var(--mantine-color-gray-7)'
                                   }} 
                                   tick={{ 
                                     fontSize: isMobile ? 12 : 14, 
                                     fill: 'var(--mantine-color-gray-7)',
-                                    dy: 5
+                                    dy: 8
                                   }}
                                   axisLine={{ stroke: 'var(--mantine-color-gray-4)' }}
                                   tickLine={{ stroke: 'var(--mantine-color-gray-4)' }}
+                                  padding={{ left: 20, right: 20 }}
                                 />
                                 <YAxis 
                                   tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
@@ -496,17 +555,18 @@ export function HECSCalculator() {
                                     value: 'Amount', 
                                     angle: -90, 
                                     position: 'insideLeft',
-                                    offset: isMobile ? 0 : 10,
+                                    offset: isMobile ? -10 : -15,
                                     fontSize: isMobile ? 12 : 14,
                                     fill: 'var(--mantine-color-gray-7)'
                                   }}
                                   tick={{ 
                                     fontSize: isMobile ? 12 : 14, 
                                     fill: 'var(--mantine-color-gray-7)',
-                                    dx: -5
+                                    dx: -8
                                   }}
                                   axisLine={{ stroke: 'var(--mantine-color-gray-4)' }}
                                   tickLine={{ stroke: 'var(--mantine-color-gray-4)' }}
+                                  padding={{ top: 20, bottom: 20 }}
                                 />
                                 <RechartsTooltip 
                                   content={<CustomTooltip />}
@@ -573,17 +633,11 @@ export function HECSCalculator() {
 
                           <Group gap="lg" mt="xs">
                             <Group gap="xs">
-                              <Box w={12} h={12} style={{ 
-                                backgroundColor: 'var(--mantine-color-blue-6)',
-                                borderRadius: '50%'
-                              }} />
+                              <Box w={12} h={12} style={{ backgroundColor: 'var(--mantine-color-blue-6)' }} className="circle" />
                               <Text size="sm">Remaining Debt: Your outstanding HECS balance over time</Text>
                             </Group>
                             <Group gap="xs">
-                              <Box w={12} h={12} style={{ 
-                                backgroundColor: 'var(--mantine-color-green-6)',
-                                borderRadius: '50%'
-                              }} />
+                              <Box w={12} h={12} style={{ backgroundColor: 'var(--mantine-color-green-6)' }} className="circle" />
                               <Text size="sm">Annual Repayment: Your yearly HECS repayment amount</Text>
                             </Group>
                           </Group>
@@ -632,6 +686,15 @@ export function HECSCalculator() {
           </Stack>
         </Container>
       </Paper>
+
+      {/* Add global styles */}
+      <style>
+        {`
+          .circle {
+            border-radius: 50%;
+          }
+        `}
+      </style>
     </Box>
   );
 } 
