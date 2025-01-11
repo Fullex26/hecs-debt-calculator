@@ -38,7 +38,7 @@ interface ProjectionMilestone {
   value: number;
 }
 
-const INDEXATION_RATE = 7.1; // Current indexation rate for 2023
+const INDEXATION_RATE = 4.0; // Current indexation rate for 2024
 
 interface TooltipProps {
   active?: boolean;
@@ -133,6 +133,8 @@ interface FormValues {
   currentDebt: string;
   annualIncome: string;
   expectedSalaryIncrease: number;
+  voluntaryPaymentYear: number | '';
+  voluntaryPaymentAmount: string;
 }
 
 export function HECSCalculator() {
@@ -141,6 +143,7 @@ export function HECSCalculator() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showVoluntary, setShowVoluntary] = useState(false);
   const [chartAnimated, setChartAnimated] = useState(false);
 
   const form = useForm<FormValues>({
@@ -148,12 +151,14 @@ export function HECSCalculator() {
       currentDebt: '',
       annualIncome: '',
       expectedSalaryIncrease: 3,
+      voluntaryPaymentYear: '',
+      voluntaryPaymentAmount: '',
     },
     validate: {
       currentDebt: (value) => {
         const numValue = Number(value);
         if (value && (isNaN(numValue) || numValue < 0)) return 'Debt cannot be negative';
-        if (numValue > 1000000) return 'Please enter a value less than $1,000,000';
+        if (numValue > 500000) return 'Please enter a value less than $500,000';
         return null;
       },
       annualIncome: (value) => {
@@ -164,7 +169,26 @@ export function HECSCalculator() {
       },
       expectedSalaryIncrease: (value) => {
         if (value < 0) return 'Percentage cannot be negative';
-        if (value > 100) return 'Please enter a percentage less than 100';
+        if (value > 25) return 'Please enter a percentage less than 25';
+        return null;
+      },
+      voluntaryPaymentAmount: (value, values) => {
+        if (!value && values.voluntaryPaymentYear) return 'Please enter a voluntary payment amount';
+        if (!value) return null;
+        const numValue = Number(value);
+        if (isNaN(numValue) || numValue < 0) return 'Payment cannot be negative';
+        if (numValue > 1000000) return 'Please enter a value less than $1,000,000';
+        const currentDebtValue = Number(values.currentDebt) || 0;
+        if (numValue > currentDebtValue) return 'Voluntary payment cannot exceed your current HECS debt';
+        if (!values.voluntaryPaymentYear) return 'Please also specify the year for the voluntary payment';
+        return null;
+      },
+      voluntaryPaymentYear: (value, values) => {
+        if (!value && values.voluntaryPaymentAmount) return 'Please enter the year for your voluntary payment';
+        if (!value) return null;
+        if (value < 0) return 'Year cannot be negative';
+        if (value > 50) return 'Please enter a year less than 50';
+        if (!values.voluntaryPaymentAmount) return 'Please also specify the voluntary payment amount';
         return null;
       },
     },
@@ -200,6 +224,8 @@ export function HECSCalculator() {
     const currentDebtValue = Number(form.values.currentDebt) || 0;
     const salaryIncrease = Number(form.values.expectedSalaryIncrease);
     const indexationRate = Number(INDEXATION_RATE);
+    const voluntaryPaymentYear = Number(form.values.voluntaryPaymentYear) || -1;
+    const voluntaryPaymentAmount = Number(form.values.voluntaryPaymentAmount) || 0;
     
     // Initialize calculation variables
     let remainingDebt = currentDebtValue;
@@ -228,53 +254,65 @@ export function HECSCalculator() {
       const yearlyRepayment = (currentIncome * repaymentRate) / 100;
       const yearlyIndexation = (remainingDebt * indexationRate) / 100;
       
+      // Apply voluntary payment if it's the specified year
+      let totalYearlyRepayment = yearlyRepayment;
+      if (years === voluntaryPaymentYear) {
+        totalYearlyRepayment += voluntaryPaymentAmount;
+        projectionMilestones.push({
+          year: years + 1,
+          description: `Voluntary payment of ${formatCurrency(voluntaryPaymentAmount)} made`,
+          type: 'success',
+          value: remainingDebt - totalYearlyRepayment,
+        });
+      }
+      
       // Update totals
       totalInterestPaid += yearlyIndexation;
-      totalRepayments += yearlyRepayment;
+      totalRepayments += totalYearlyRepayment;
+
+      // Update remaining debt and ensure it doesn't go below 0
+      remainingDebt = Math.max(0, remainingDebt + yearlyIndexation - totalYearlyRepayment);
+
+      // Store yearly data
+      yearlyData.push({
+        year: years + 1,
+        remainingDebt,
+        annualRepayment: totalYearlyRepayment,
+        income: currentIncome,
+      });
+
+      // Update values for next year
+      currentIncome = currentIncome + (currentIncome * salaryIncrease) / 100;
+      years++;
 
       // Check for milestones
       if (!quarterPaidYear && remainingDebt <= initialDebt * 0.75) {
-        quarterPaidYear = years + 1;
+        quarterPaidYear = years;
         projectionMilestones.push({
-          year: years + 1,
+          year: years,
           description: '25% of debt repaid',
           type: 'milestone',
           value: remainingDebt,
         });
       }
       if (!halfPaidYear && remainingDebt <= initialDebt * 0.5) {
-        halfPaidYear = years + 1;
+        halfPaidYear = years;
         projectionMilestones.push({
-          year: years + 1,
+          year: years,
           description: '50% of debt repaid',
           type: 'milestone',
           value: remainingDebt,
         });
       }
       if (!threeQuartersPaidYear && remainingDebt <= initialDebt * 0.25) {
-        threeQuartersPaidYear = years + 1;
+        threeQuartersPaidYear = years;
         projectionMilestones.push({
-          year: years + 1,
+          year: years,
           description: '75% of debt repaid',
           type: 'milestone',
           value: remainingDebt,
         });
       }
-
-      yearlyData.push({
-        year: years + 1,
-        remainingDebt: Math.max(0, remainingDebt),
-        annualRepayment: yearlyRepayment,
-        income: currentIncome,
-      });
-
-      // Update values for next year
-      const indexationAmount = (remainingDebt * indexationRate) / 100;
-      const salaryIncreaseAmount = (currentIncome * salaryIncrease) / 100;
-      
-      remainingDebt = remainingDebt + indexationAmount - yearlyRepayment;
-      currentIncome = currentIncome + salaryIncreaseAmount;
-      years++;
     }
 
     // Add completion milestone
@@ -294,7 +332,7 @@ export function HECSCalculator() {
       });
     }
 
-    const totalWithIndexation = form.values.currentDebt * (1 + INDEXATION_RATE / 100);
+    const totalWithIndexation = (Number(form.values.currentDebt) || 0) * (1 + INDEXATION_RATE / 100);
 
     return {
       repaymentRate: initialRepaymentRate,
@@ -308,19 +346,6 @@ export function HECSCalculator() {
       totalRepayments,
     };
   };
-
-  const handleSubmit = form.onSubmit(async (values) => {
-    setIsCalculating(true);
-    setChartAnimated(false);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      const calculationResult = calculateRepayment(Number(values.annualIncome) || 0);
-      setResult(calculationResult);
-      setTimeout(() => setChartAnimated(true), 100);
-    } finally {
-      setIsCalculating(false);
-    }
-  });
 
   return (
     <Box pos="relative" mih={height}>
@@ -347,28 +372,96 @@ export function HECSCalculator() {
             <Divider />
 
             {/* Form Section */}
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={form.onSubmit((values) => {
+              if (!values.currentDebt || !values.annualIncome) {
+                return;
+              }
+              setIsCalculating(true);
+              setTimeout(() => {
+                const result = calculateRepayment(Number(values.annualIncome));
+                setResult(result);
+                setIsCalculating(false);
+                setChartAnimated(true);
+              }, 200);
+            })}>
               <Grid gutter="md">
                 <Grid.Col span={{ base: 12, md: 6 }}>
                   <Card>
-                    <NumberInput
-                      label={
-                        <Group gap="xs">
-                          <Text fw={500} size={isMobile ? 'md' : 'lg'}>Current HECS Debt</Text>
-                          <Tooltip label="Your current HECS-HELP loan balance">
-                            <IconInfoCircle size={18} style={{ cursor: 'help' }} />
-                          </Tooltip>
+                    <Stack gap="md">
+                      <NumberInput
+                        label={
+                          <Group gap="xs">
+                            <Text fw={500} size={isMobile ? 'md' : 'lg'}>Current HECS Debt</Text>
+                            <Tooltip label="Your current HECS-HELP loan balance">
+                              <IconInfoCircle size={18} style={{ cursor: 'help' }} />
+                            </Tooltip>
+                          </Group>
+                        }
+                        placeholder="Enter your current HECS debt"
+                        size={isMobile ? 'md' : 'lg'}
+                        {...form.getInputProps('currentDebt')}
+                        min={0}
+                        max={1000000}
+                        leftSection={<IconCurrencyDollar size={18} />}
+                        hideControls
+                        clampBehavior="strict"
+                        required
+                      />
+
+                      <Box>
+                        <Group justify="space-between" mb="xs">
+                          <Text size={isMobile ? 'sm' : 'md'} fw={500}>Voluntary Repayment Options</Text>
+                          <ActionIcon 
+                            variant="subtle" 
+                            onClick={() => setShowVoluntary(!showVoluntary)}
+                            size={isMobile ? 'md' : 'lg'}
+                            aria-label={showVoluntary ? 'Hide voluntary repayment options' : 'Show voluntary repayment options'}
+                          >
+                            {showVoluntary ? <IconChevronUp size={20} /> : <IconChevronDown size={20} />}
+                          </ActionIcon>
                         </Group>
-                      }
-                      placeholder="Enter your current HECS debt"
-                      size={isMobile ? 'md' : 'lg'}
-                      {...form.getInputProps('currentDebt')}
-                      min={0}
-                      max={1000000}
-                      leftSection={<IconCurrencyDollar size={18} />}
-                      hideControls
-                      clampBehavior="strict"
-                    />
+                        
+                        <Collapse in={showVoluntary} transitionDuration={200}>
+                          <Stack gap="sm">
+                            <NumberInput
+                              label={
+                                <Group gap="xs">
+                                  <Text fw={500} size={isMobile ? 'md' : 'lg'}>Voluntary Payment Year</Text>
+                                  <Tooltip label="Which year would you like to make the voluntary payment?">
+                                    <IconInfoCircle size={18} style={{ cursor: 'help' }} />
+                                  </Tooltip>
+                                </Group>
+                              }
+                              placeholder="Enter year (e.g. 2)"
+                              size={isMobile ? 'md' : 'lg'}
+                              min={1}
+                              max={50}
+                              hideControls
+                              clampBehavior="strict"
+                              {...form.getInputProps('voluntaryPaymentYear')}
+                            />
+                            <NumberInput
+                              label={
+                                <Group gap="xs">
+                                  <Text fw={500} size={isMobile ? 'md' : 'lg'}>Voluntary Payment Amount</Text>
+                                  <Tooltip label="How much would you like to pay voluntarily?">
+                                    <IconInfoCircle size={18} style={{ cursor: 'help' }} />
+                                  </Tooltip>
+                                </Group>
+                              }
+                              placeholder="Enter amount (e.g. 5000)"
+                              size={isMobile ? 'md' : 'lg'}
+                              min={0}
+                              max={1000000}
+                              leftSection={<IconCurrencyDollar size={18} />}
+                              hideControls
+                              clampBehavior="strict"
+                              {...form.getInputProps('voluntaryPaymentAmount')}
+                            />
+                          </Stack>
+                        </Collapse>
+                      </Box>
+                    </Stack>
                   </Card>
                 </Grid.Col>
 
@@ -397,6 +490,7 @@ export function HECSCalculator() {
                         leftSection={<IconCurrencyDollar size={18} />}
                         hideControls
                         clampBehavior="strict"
+                        required
                       />
 
                       <Box>
