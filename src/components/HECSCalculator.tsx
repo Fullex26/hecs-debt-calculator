@@ -11,6 +11,7 @@ import {
   IconChevronDown, IconChevronUp, IconCurrencyDollar
 } from '@tabler/icons-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import './HECSCalculator.css';
 
 interface CalculationResult {
   repaymentRate: number;
@@ -617,7 +618,7 @@ export function HECSCalculator() {
                             <Title order={2} size={isMobile ? 'h3' : 'h2'}>Repayment Projection</Title>
                             <Tooltip label="The chart shows your projected HECS debt balance and annual repayments over time">
                               <ActionIcon variant="subtle" radius="xl" size={isMobile ? 'md' : 'lg'}>
-                                <IconInfoCircle style={{ cursor: 'help' }} />
+                                <IconInfoCircle className="help-cursor" />
                               </ActionIcon>
                             </Tooltip>
                           </Group>
@@ -626,7 +627,7 @@ export function HECSCalculator() {
                             Track how your HECS debt decreases over time as you make repayments, accounting for indexation and salary increases.
                           </Text>
 
-                          <Box style={{ height: isMobile ? 300 : 500 }}>
+                          <Box className="chart-container">
                             <ResponsiveContainer width="100%" height="100%">
                               <LineChart
                                 data={result.yearlyData}
@@ -744,11 +745,11 @@ export function HECSCalculator() {
 
                           <Group gap="lg" mt="xs">
                             <Group gap="xs">
-                              <Box w={12} h={12} style={{ backgroundColor: 'var(--mantine-color-blue-6)' }} className="circle" />
+                              <Box w={12} h={12} className="circle legend-dot-blue" />
                               <Text size="sm">Remaining Debt: Your outstanding HECS balance over time</Text>
                             </Group>
                             <Group gap="xs">
-                              <Box w={12} h={12} style={{ backgroundColor: 'var(--mantine-color-green-6)' }} className="circle" />
+                              <Box w={12} h={12} className="circle legend-dot-green" />
                               <Text size="sm">Annual Repayment: Your yearly HECS repayment amount</Text>
                             </Group>
                           </Group>
@@ -797,15 +798,6 @@ export function HECSCalculator() {
           </Stack>
         </Container>
       </Paper>
-
-      {/* Add global styles */}
-      <style>
-        {`
-          .circle {
-            border-radius: 50%;
-          }
-        `}
-      </style>
     </Box>
   );
 } 

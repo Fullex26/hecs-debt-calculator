@@ -1,0 +1,25 @@
+.circle {
+  border-radius: 50%;
+}
+
+.chart-container {
+  height: 300px;
+}
+
+@media (min-width: 480px) {
+  .chart-container {
+    height: 500px;
+  }
+}
+
+.legend-dot-blue {
+  background-color: var(--mantine-color-blue-6);
+}
+
+.legend-dot-green {
+  background-color: var(--mantine-color-green-6);
+}
+
+.help-cursor {
+  cursor: help;
+} 
