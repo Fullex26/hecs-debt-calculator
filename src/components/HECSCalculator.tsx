@@ -681,11 +681,11 @@ export function HECSCalculator() {
                                     position: 'insideBottom', 
                                     offset: -10,
                                     fontSize: isMobile ? 12 : 14,
-                                    fill: 'var(--mantine-color-gray-7)'
+                                    fill: 'var(--mantine-color-dimmed)'
                                   }} 
                                   tick={{ 
                                     fontSize: isMobile ? 12 : 14, 
-                                    fill: 'var(--mantine-color-gray-7)',
+                                    fill: 'var(--mantine-color-dimmed)',
                                     dy: 8
                                   }}
                                   axisLine={{ stroke: 'var(--mantine-color-gray-4)' }}
@@ -700,11 +700,11 @@ export function HECSCalculator() {
                                     position: 'insideLeft',
                                     offset: isMobile ? -10 : -15,
                                     fontSize: isMobile ? 12 : 14,
-                                    fill: 'var(--mantine-color-gray-7)'
+                                    fill: 'var(--mantine-color-dimmed)'
                                   }}
                                   tick={{ 
                                     fontSize: isMobile ? 12 : 14, 
-                                    fill: 'var(--mantine-color-gray-7)',
+                                    fill: 'var(--mantine-color-dimmed)',
                                     dx: -8
                                   }}
                                   axisLine={{ stroke: 'var(--mantine-color-gray-4)' }}

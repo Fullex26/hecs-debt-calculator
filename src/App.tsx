@@ -107,7 +107,10 @@ const theme = createTheme({
 
 function App() {
   return (
-    <MantineProvider theme={theme}>
+    <MantineProvider 
+      theme={theme}
+      defaultColorScheme="auto"
+    >
       <HECSCalculator />
     </MantineProvider>
   );
