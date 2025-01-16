@@ -2,7 +2,7 @@ import { useForm } from '@mantine/form';
 import { 
   Button, Paper, Title, Stack, NumberInput, Box, Text, Grid, 
   Tooltip, ThemeIcon, Divider, Timeline, LoadingOverlay,
-  Card, Group, Container, ActionIcon, Collapse, Transition, Table
+  Card, Group, Container, ActionIcon, Collapse, Transition
 } from '@mantine/core';
 import { useMediaQuery, useViewportSize } from '@mantine/hooks';
 import { useState } from 'react';
@@ -81,55 +81,6 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   return null;
 };
 
-const REPAYMENT_THRESHOLDS = [
-  { min: 0, max: 54434, rate: 0 },
-  { min: 54435, max: 62850, rate: 1.0 },
-  { min: 62851, max: 66620, rate: 2.0 },
-  { min: 66621, max: 70618, rate: 2.5 },
-  { min: 70619, max: 74855, rate: 3.0 },
-  { min: 74856, max: 79346, rate: 3.5 },
-  { min: 79347, max: 84107, rate: 4.0 },
-  { min: 84108, max: 89154, rate: 4.5 },
-  { min: 89155, max: 94503, rate: 5.0 },
-  { min: 94504, max: 100174, rate: 5.5 },
-  { min: 100175, max: 106185, rate: 6.0 },
-  { min: 106186, max: 112556, rate: 6.5 },
-  { min: 112557, max: 119309, rate: 7.0 },
-  { min: 119310, max: 126467, rate: 7.5 },
-  { min: 126468, max: 134056, rate: 8.0 },
-  { min: 134057, max: 142100, rate: 8.5 },
-  { min: 142101, max: 150626, rate: 9.0 },
-  { min: 150627, max: 159663, rate: 9.5 },
-  { min: 159664, max: Infinity, rate: 10.0 }
-];
-
-const RepaymentThresholdTooltip = () => (
-  <Box p="xs">
-    <Text fw={500} mb="xs">2024-25 Repayment Thresholds</Text>
-    <Table miw={300} layout="fixed">
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th>Income Range</Table.Th>
-          <Table.Th>Rate</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {REPAYMENT_THRESHOLDS.map((threshold, index) => (
-          <Table.Tr key={index}>
-            <Table.Td>
-              {threshold.max === Infinity 
-                ? `$${formatCurrency(threshold.min)} and above`
-                : `$${formatCurrency(threshold.min)} - $${formatCurrency(threshold.max)}`
-              }
-            </Table.Td>
-            <Table.Td>{threshold.rate}%</Table.Td>
-          </Table.Tr>
-        ))}
-      </Table.Tbody>
-    </Table>
-  </Box>
-);
-
 interface FormValues {
   currentDebt: string;
   annualIncome: string;
@@ -143,7 +94,7 @@ export function HECSCalculator() {
   const { height } = useViewportSize();
   const [isCalculating, setIsCalculating] = useState(false);
   const [result, setResult] = useState<CalculationResult | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdditional, setShowAdditional] = useState(false);
   const [showVoluntary, setShowVoluntary] = useState(false);
   const [chartAnimated, setChartAnimated] = useState(false);
 
@@ -513,18 +464,18 @@ export function HECSCalculator() {
 
                       <Box>
                         <Group justify="space-between" mb="xs">
-                          <Text size={isMobile ? 'md' : 'lg'} fw={500}>Advanced Options</Text>
+                          <Text size={isMobile ? 'md' : 'lg'} fw={500}>Additional Options</Text>
                           <ActionIcon 
                             variant="subtle" 
-                            onClick={() => setShowAdvanced(!showAdvanced)}
+                            onClick={() => setShowAdditional(!showAdditional)}
                             size={isMobile ? 'md' : 'lg'}
-                            aria-label={showAdvanced ? 'Hide advanced options' : 'Show advanced options'}
+                            aria-label={showAdditional ? 'Hide additional options' : 'Show additional options'}
                           >
-                            {showAdvanced ? <IconChevronUp size={20} /> : <IconChevronDown size={20} />}
+                            {showAdditional ? <IconChevronUp size={20} /> : <IconChevronDown size={20} />}
                           </ActionIcon>
                         </Group>
                         
-                        <Collapse in={showAdvanced} transitionDuration={200}>
+                        <Collapse in={showAdditional} transitionDuration={200}>
                           <Stack gap="sm" pl="md">
                             <NumberInput
                               label={
