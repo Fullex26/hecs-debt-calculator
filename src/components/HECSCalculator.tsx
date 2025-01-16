@@ -364,7 +364,7 @@ export function HECSCalculator() {
               </ThemeIcon>
               <Title order={1} size={isMobile ? 'h2' : 'h1'}>HECS Debt Calculator</Title>
               <Text c="dimmed" size={isMobile ? 'md' : 'lg'} mt="xs" maw={600} mx="auto">
-                Plan your future with our comprehensive HECS-HELP loan calculator. Calculate your repayments, track milestones, and understand your debt journey.
+              Plan your future with confidence using our comprehensive HECS-HELP loan calculator. Easily estimate your repayments, see important milestones, and gain a clear understanding of your student debt journey. Please note, all results are estimates and should not be considered financial advice.
               </Text>
             </Box>
 
