@@ -393,7 +393,7 @@ export function HECSCalculator() {
                         label={
                           <Group gap="xs">
                             <Text fw={500} size={isMobile ? 'md' : 'lg'}>Current HECS Debt</Text>
-                            <Tooltip label="Your current HECS-HELP loan balance">
+                            <Tooltip label="Your current or expected HECS-HELP loan balance">
                               <IconInfoCircle size={18} style={{ cursor: 'help' }} />
                             </Tooltip>
                           </Group>
@@ -411,7 +411,7 @@ export function HECSCalculator() {
 
                       <Box>
                         <Group justify="space-between" mb="xs">
-                          <Text size={isMobile ? 'sm' : 'md'} fw={500}>Voluntary Repayment Options</Text>
+                          <Text size={isMobile ? 'md' : 'lg'} fw={500}>Voluntary Repayment Options</Text>
                           <ActionIcon 
                             variant="subtle" 
                             onClick={() => setShowVoluntary(!showVoluntary)}
@@ -474,7 +474,7 @@ export function HECSCalculator() {
                           <Group gap="xs">
                             <Text fw={500} size={isMobile ? 'md' : 'lg'}>Annual Income</Text>
                             <Tooltip 
-                              label={<RepaymentThresholdTooltip />}
+                              label="Your current or expected annual income before tax deductions"
                               position="right"
                               multiline
                               maw={350}
@@ -496,7 +496,7 @@ export function HECSCalculator() {
 
                       <Box>
                         <Group justify="space-between" mb="xs">
-                          <Text size={isMobile ? 'sm' : 'md'} fw={500}>Advanced Options</Text>
+                          <Text size={isMobile ? 'md' : 'lg'} fw={500}>Advanced Options</Text>
                           <ActionIcon 
                             variant="subtle" 
                             onClick={() => setShowAdvanced(!showAdvanced)}
