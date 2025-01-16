@@ -177,8 +177,6 @@ export function HECSCalculator() {
         if (!value && values.voluntaryPaymentYear) return 'Please enter a voluntary payment amount';
         if (!value) return null;
         const numValue = Number(value);
-        if (isNaN(numValue) || numValue < 0) return 'Payment cannot be negative';
-        if (numValue > 1000000) return 'Please enter a value less than $1,000,000';
         const currentDebtValue = Number(values.currentDebt) || 0;
         if (numValue > currentDebtValue) return 'Voluntary payment cannot exceed your current HECS debt';
         if (!values.voluntaryPaymentYear) return 'Please also specify the year for the voluntary payment';
@@ -393,7 +391,13 @@ export function HECSCalculator() {
                         label={
                           <Group gap="xs">
                             <Text fw={500} size={isMobile ? 'md' : 'lg'}>Current HECS Debt</Text>
-                            <Tooltip label="Your current or expected HECS-HELP loan balance">
+                            <Tooltip 
+                              label="Your current or expected HECS-HELP loan balance"
+                              position={isMobile ? "bottom" : "right"}
+                              multiline
+                              maw={300}
+                              withArrow
+                            >
                               <IconInfoCircle size={18} style={{ cursor: 'help' }} />
                             </Tooltip>
                           </Group>
@@ -402,7 +406,7 @@ export function HECSCalculator() {
                         size={isMobile ? 'md' : 'lg'}
                         {...form.getInputProps('currentDebt')}
                         min={0}
-                        max={1000000}
+                        max={500000}
                         leftSection={<IconCurrencyDollar size={18} />}
                         hideControls
                         clampBehavior="strict"
@@ -423,18 +427,24 @@ export function HECSCalculator() {
                         </Group>
                         
                         <Collapse in={showVoluntary} transitionDuration={200}>
-                          <Stack gap="sm">
+                          <Stack gap="sm" pl="md">
                             <NumberInput
                               label={
                                 <Group gap="xs">
-                                  <Text fw={500} size={isMobile ? 'md' : 'lg'}>Voluntary Payment Year</Text>
-                                  <Tooltip label="Which year would you like to make the voluntary payment?">
-                                    <IconInfoCircle size={18} style={{ cursor: 'help' }} />
+                                  <Text fw={500} size={isMobile ? 'sm' : 'md'}>Voluntary Payment Year</Text>
+                                  <Tooltip 
+                                    label="Which year would you like to make the voluntary payment?"
+                                    position={isMobile ? "bottom" : "right"}
+                                    multiline
+                                    maw={300}
+                                    withArrow
+                                  >
+                                    <IconInfoCircle size={16} style={{ cursor: 'help' }} />
                                   </Tooltip>
                                 </Group>
                               }
                               placeholder="Enter year (e.g. 2)"
-                              size={isMobile ? 'md' : 'lg'}
+                              size={isMobile ? 'sm' : 'md'}
                               min={1}
                               max={50}
                               hideControls
@@ -444,17 +454,23 @@ export function HECSCalculator() {
                             <NumberInput
                               label={
                                 <Group gap="xs">
-                                  <Text fw={500} size={isMobile ? 'md' : 'lg'}>Voluntary Payment Amount</Text>
-                                  <Tooltip label="How much would you like to pay voluntarily?">
-                                    <IconInfoCircle size={18} style={{ cursor: 'help' }} />
+                                  <Text fw={500} size={isMobile ? 'sm' : 'md'}>Voluntary Payment Amount</Text>
+                                  <Tooltip 
+                                    label="How much would you like to pay voluntarily?"
+                                    position={isMobile ? "bottom" : "right"}
+                                    multiline
+                                    maw={300}
+                                    withArrow
+                                  >
+                                    <IconInfoCircle size={16} style={{ cursor: 'help' }} />
                                   </Tooltip>
                                 </Group>
                               }
                               placeholder="Enter amount (e.g. 5000)"
-                              size={isMobile ? 'md' : 'lg'}
+                              size={isMobile ? 'sm' : 'md'}
                               min={0}
                               max={1000000}
-                              leftSection={<IconCurrencyDollar size={18} />}
+                              leftSection={<IconCurrencyDollar size={16} />}
                               hideControls
                               clampBehavior="strict"
                               {...form.getInputProps('voluntaryPaymentAmount')}
@@ -475,9 +491,10 @@ export function HECSCalculator() {
                             <Text fw={500} size={isMobile ? 'md' : 'lg'}>Annual Income</Text>
                             <Tooltip 
                               label="Your current or expected annual income before tax deductions"
-                              position="right"
+                              position={isMobile ? "bottom" : "right"}
                               multiline
-                              maw={350}
+                              maw={300}
+                              withArrow
                             >
                               <IconInfoCircle size={18} style={{ cursor: 'help' }} />
                             </Tooltip>
@@ -508,25 +525,33 @@ export function HECSCalculator() {
                         </Group>
                         
                         <Collapse in={showAdvanced} transitionDuration={200}>
-                          <NumberInput
-                            label={
-                              <Group gap="xs">
-                                <Text fw={500} size={isMobile ? 'md' : 'lg'}>Expected Annual Salary Increase (%)</Text>
-                                <Tooltip label="Estimated yearly percentage increase in your salary">
-                                  <IconInfoCircle size={18} style={{ cursor: 'help' }} />
-                                </Tooltip>
-                              </Group>
-                            }
-                            placeholder="Enter expected salary increase"
-                            size={isMobile ? 'md' : 'lg'}
-                            min={0}
-                            max={100}
-                            step={0.5}
-                            hideControls
-                            clampBehavior="strict"
-                            {...form.getInputProps('expectedSalaryIncrease')}
-                            rightSection={<IconPercentage size={18} />}
-                          />
+                          <Stack gap="sm" pl="md">
+                            <NumberInput
+                              label={
+                                <Group gap="xs">
+                                  <Text fw={500} size={isMobile ? 'sm' : 'md'}>Expected Annual Salary Increase (%)</Text>
+                                  <Tooltip 
+                                    label="Estimated yearly percentage increase in your salary"
+                                    position={isMobile ? "bottom" : "right"}
+                                    multiline
+                                    maw={300}
+                                    withArrow
+                                  >
+                                    <IconInfoCircle size={16} style={{ cursor: 'help' }} />
+                                  </Tooltip>
+                                </Group>
+                              }
+                              placeholder="Enter expected salary increase"
+                              size={isMobile ? 'sm' : 'md'}
+                              min={0}
+                              max={100}
+                              step={0.5}
+                              hideControls
+                              clampBehavior="strict"
+                              {...form.getInputProps('expectedSalaryIncrease')}
+                              rightSection={<IconPercentage size={16} />}
+                            />
+                          </Stack>
                         </Collapse>
                       </Box>
                     </Stack>
@@ -616,7 +641,13 @@ export function HECSCalculator() {
                         <Stack gap="md">
                           <Group justify="space-between" align="center">
                             <Title order={2} size={isMobile ? 'h3' : 'h2'}>Repayment Projection</Title>
-                            <Tooltip label="The chart shows your projected HECS debt balance and annual repayments over time">
+                            <Tooltip 
+                              label="The chart shows your projected HECS debt balance and annual repayments over time"
+                              position={isMobile ? "bottom" : "right"}
+                              multiline
+                              maw={300}
+                              withArrow
+                            >
                               <ActionIcon variant="subtle" radius="xl" size={isMobile ? 'md' : 'lg'}>
                                 <IconInfoCircle className="help-cursor" />
                               </ActionIcon>
