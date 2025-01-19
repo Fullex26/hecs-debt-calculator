@@ -779,6 +779,15 @@ export function HECSCalculator() {
             </Transition>
           </Stack>
         </Container>
+
+        {/* Footer */}
+        <Box mt="xl" py="md" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
+          <Container size="xl">
+            <Text c="dimmed" ta="center" size="sm">
+              © {new Date().getFullYear()} HECS Debt Calculator. All rights reserved.
+            </Text>
+          </Container>
+        </Box>
       </Paper>
     </Box>
   );
