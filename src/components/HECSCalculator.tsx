@@ -2,15 +2,19 @@ import { useForm } from '@mantine/form';
 import { 
   Button, Paper, Title, Stack, NumberInput, Box, Text, Grid, 
   Tooltip, ThemeIcon, Divider, Timeline, LoadingOverlay,
-  Card, Group, Container, ActionIcon, Collapse, Transition
+  Card, Group, Container, ActionIcon, Collapse, Transition,
+  Notification
 } from '@mantine/core';
 import { useMediaQuery, useViewportSize } from '@mantine/hooks';
 import { useState } from 'react';
 import { 
   IconInfoCircle, IconCalculator, IconPercentage,
-  IconChevronDown, IconChevronUp, IconCurrencyDollar
+  IconChevronDown, IconChevronUp, IconCurrencyDollar,
+  IconCheck, IconX
 } from '@tabler/icons-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import { supabase } from '../lib/supabase';
+import type { CalculatorInput } from '../lib/supabase';
 import './HECSCalculator.css';
 
 interface CalculationResult {
@@ -97,6 +101,11 @@ export function HECSCalculator() {
   const [showAdditional, setShowAdditional] = useState(false);
   const [showVoluntary, setShowVoluntary] = useState(false);
   const [chartAnimated, setChartAnimated] = useState(false);
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    message: string;
+    type: 'error';
+  }>({ show: false, message: '', type: 'error' });
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -297,6 +306,60 @@ export function HECSCalculator() {
     };
   };
 
+  const saveCalculation = async (values: FormValues, result: CalculationResult) => {
+    try {
+      const calculatorInput: CalculatorInput = {
+        current_debt: Number(values.currentDebt),
+        annual_income: Number(values.annualIncome),
+        expected_salary_increase: values.expectedSalaryIncrease,
+        voluntary_payment_year: values.voluntaryPaymentYear || null,
+        voluntary_payment_amount: values.voluntaryPaymentAmount ? Number(values.voluntaryPaymentAmount) : null,
+        years_to_repay: result.yearsToRepay,
+        total_interest: result.totalInterestPaid,
+        total_repayments: result.totalRepayments
+      };
+
+      const { error } = await supabase
+        .from('calculator_inputs')
+        .insert([calculatorInput]);
+
+      if (error) throw error;
+
+      console.log('Calculation saved successfully:', {
+        debt: formatCurrency(calculatorInput.current_debt),
+        income: formatCurrency(calculatorInput.annual_income),
+        yearsToRepay: calculatorInput.years_to_repay,
+        totalInterest: formatCurrency(calculatorInput.total_interest)
+      });
+    } catch (error) {
+      console.error('Error saving calculation:', error);
+      setNotification({
+        show: true,
+        message: 'Failed to save calculation. Please try again.',
+        type: 'error'
+      });
+
+      // Hide error notification after 5 seconds
+      setTimeout(() => {
+        setNotification(prev => ({ ...prev, show: false }));
+      }, 5000);
+    }
+  };
+
+  const handleSubmit = form.onSubmit((values) => {
+    if (!values.currentDebt || !values.annualIncome) {
+      return;
+    }
+    setIsCalculating(true);
+    setTimeout(() => {
+      const calculationResult = calculateRepayment(Number(values.annualIncome));
+      setResult(calculationResult);
+      setIsCalculating(false);
+      setChartAnimated(true);
+      saveCalculation(values, calculationResult);
+    }, 200);
+  });
+
   return (
     <Box pos="relative" mih={height}>
       <LoadingOverlay 
@@ -305,6 +368,22 @@ export function HECSCalculator() {
         overlayProps={{ blur: 2 }}
         loaderProps={{ size: 'xl', color: 'blue' }}
       />
+      {notification.show && (
+        <Notification
+          title="Error"
+          color="red"
+          icon={<IconX size={18} />}
+          onClose={() => setNotification(prev => ({ ...prev, show: false }))}
+          style={{
+            position: 'fixed',
+            top: 20,
+            right: 20,
+            zIndex: 1000
+          }}
+        >
+          {notification.message}
+        </Notification>
+      )}
       <Paper radius={0} style={{ minHeight: '100vh' }}>
         <Container size="xl">
           <Stack gap="md">
@@ -322,18 +401,7 @@ export function HECSCalculator() {
             <Divider />
 
             {/* Form Section */}
-            <form onSubmit={form.onSubmit((values) => {
-              if (!values.currentDebt || !values.annualIncome) {
-                return;
-              }
-              setIsCalculating(true);
-              setTimeout(() => {
-                const result = calculateRepayment(Number(values.annualIncome));
-                setResult(result);
-                setIsCalculating(false);
-                setChartAnimated(true);
-              }, 200);
-            })}>
+            <form onSubmit={handleSubmit}>
               <Grid gutter="md">
                 <Grid.Col span={{ base: 12, md: 6 }}>
                   <Card>
