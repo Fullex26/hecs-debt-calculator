@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { 
   IconInfoCircle, IconCalculator, IconPercentage,
   IconChevronDown, IconChevronUp, IconCurrencyDollar,
-  IconCheck, IconX
+  IconX
 } from '@tabler/icons-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { supabase } from '../lib/supabase';
