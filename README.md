@@ -18,6 +18,58 @@ A modern, interactive web application that helps Australian students and graduat
 
 [View Live Demo](#) <!-- Add your deployment URL here -->
 
+## Deployment Workflow
+
+This project uses a structured deployment workflow with multiple environments:
+
+### Environments
+
+- **Development** - Connected to the `development` branch - for testing features
+- **Production** - Connected to the `main` branch - for live, user-facing deployments
+
+### Branch Structure
+
+- `main` - Production branch, deployed to the live site
+- `development` - Development/staging branch, deployed to staging site
+- Feature branches - Created from `development` for implementing new features
+
+### Contributing Flow
+
+1. Create a feature branch from `development`
+   ```bash
+   git checkout development
+   git pull
+   git checkout -b feature/your-feature-name
+   ```
+
+2. Implement your changes and commit them
+   ```bash
+   git add .
+   git commit -m "Implement feature X"
+   ```
+
+3. Push your branch and create a Pull Request to the `development` branch
+   ```bash
+   git push -u origin feature/your-feature-name
+   ```
+
+4. After code review and approval, merge the PR into `development`
+   - This will automatically deploy to the staging environment
+
+5. Test on the staging environment to verify everything works
+
+6. Create a PR from `development` to `main` for production deployment
+   - This requires code review approval before merging
+
+7. After approval, merge to `main` to deploy to production
+
+### Environment Variables
+
+Each environment has its own set of environment variables:
+
+- `.env.development` - Used for the development environment
+- `.env.production` - Used for the production environment
+
 ## Technology Stack
 
 - React 18
@@ -26,6 +78,7 @@ A modern, interactive web application that helps Australian students and graduat
 - Mantine UI
 - Recharts
 - Tabler Icons
+- Supabase
 
 ## Getting Started
 
@@ -66,6 +119,16 @@ To create a production build:
 npm run build
 # or
 yarn build
+```
+
+For environment-specific builds:
+
+```bash
+# Development build
+npm run build:dev
+
+# Production build
+npm run build:prod
 ```
 
 The built files will be in the `dist` directory.
