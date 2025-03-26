@@ -10,6 +10,11 @@ permissions:
   contents: read
   deployments: write
   statuses: write
+  issues: write
+  pull-requests: write
+  checks: write # For creating check runs
+  actions: read # For reading workflow info
+  discussions: write # For commenting on discussions if needed
 
 jobs:
   deploy:
