@@ -115,42 +115,74 @@ If a deployment fails:
 4. Push the fix to the appropriate branch
 5. The deployment will automatically retry
 
+### Common Deployment Issues
+
+#### "Resource not accessible by integration" Error
+
+This error occurs when GitHub Actions does not have sufficient permissions to access resources. To resolve:
+
+1. Verify workflow permissions in the YAML files match those documented below
+2. Check Repository Settings > Actions > General > Workflow permissions are set to "Read and write permissions"
+3. Check that the GITHUB_TOKEN has the necessary permissions
+4. Ensure your Vercel token has not expired and has sufficient permissions
+
+#### Failed Deployments on Vercel
+
+If deployments fail on Vercel's side:
+
+1. Check if the build is failing due to environment variables - ensure all required variables are set
+2. Verify the Vercel project configuration in `vercel.json`
+3. Check if there are any Vercel platform issues by visiting their status page
+
 ## GitHub Actions Permissions
 
-Our GitHub Actions workflows have specific permissions configured to ensure they can perform necessary deployment operations:
+Our GitHub Actions workflows now have enhanced permissions configured to ensure they can perform all necessary operations:
 
-### Production Workflow
-The production deployment workflow has these permissions:
-- `contents: read` - For reading repository content
+### Production and Development Workflows
+
+Both production and development deployment workflows have these permissions:
+
+- `contents: write` - For reading and writing repository content
 - `deployments: write` - For creating deployments
 - `statuses: write` - For updating commit statuses
 - `issues: write` - For commenting on issues
 - `pull-requests: write` - For commenting on PRs with deployment information
 - `checks: write` - For creating check runs
-- `actions: read` - For reading workflow information
+- `actions: write` - For managing workflow runs
 - `discussions: write` - For commenting on discussions
-
-### Development Workflow
-The development deployment workflow has similar permissions:
-- `contents: read` - For reading repository content
-- `deployments: write` - For creating deployments 
-- `statuses: write` - For updating commit statuses
-- `issues: write` - For commenting on issues
-- `pull-requests: write` - For commenting on PRs with deployment information
-- `checks: write` - For creating check runs
-- `actions: read` - For reading workflow information
-- `discussions: write` - For commenting on discussions
+- `security-events: write` - For security scanning and reporting
 
 ### CI Workflow
-The CI workflow used for pull requests has:
-- `contents: read` - For reading repository content
-- `pull-requests: read` - For accessing pull request information
 
-If deployment issues occur with "Resource not accessible by integration" errors, check:
-1. Workflow permissions in the YAML files
-2. Repository secrets configuration
-3. Vercel token permissions and expiration
-4. GitHub Actions permissions settings in the repository settings
+The CI workflow used for pull requests has:
+
+- `contents: read` - For reading repository content
+- `pull-requests: write` - For writing status comments to pull requests
+- `checks: write` - For creating check runs
+- `actions: read` - For reading workflow information
+- `security-events: write` - For security scanning
+
+### Permission Explanation and Reasoning
+
+Each permission is set with a specific purpose:
+
+- `contents: write` - Allows reading and modifying repository files, necessary for deployment processes
+- `deployments: write` - Enables creation and management of deployments
+- `statuses: write` - Allows updating commit status checks
+- `pull-requests: write` - Enables commenting on PRs with deployment information and status
+- `checks: write` - Permits creating GitHub Actions check runs
+- `actions: write` - Allows management of workflow runs
+- `discussions: write` - Enables posting to discussions
+- `security-events: write` - Permits security vulnerability scanning
+
+### Repository Settings
+
+In addition to workflow file permissions, you should also configure repository settings:
+
+1. Go to Repository Settings > Actions > General
+2. Under "Workflow permissions", select "Read and write permissions"
+3. Check "Allow GitHub Actions to create and approve pull requests"
+4. Save changes
 
 ## Environment Variables
 

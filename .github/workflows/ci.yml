@@ -4,10 +4,13 @@ on:
   pull_request:
     branches: ["*"]
 
-# Define permissions at workflow level
+# Define permissions at workflow level with enhanced access
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write # Upgraded from read to write to post status comments
+  checks: write # Added to create check runs
+  actions: read # Added to read workflow runs
+  security-events: write # Added for security scanning
 
 jobs:
   test:
