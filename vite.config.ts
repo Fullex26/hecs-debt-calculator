@@ -8,13 +8,13 @@ export default defineConfig(({ mode }) => {
   
   // Expose Vercel environment variables to the client
   const envWithProcessPrefix = Object.entries(env).reduce(
-    (acc, [key, val]) => {
+    (acc: Record<string, string>, [key, val]) => {
       // Forward all variables to the client
       // Including PRODUCTION_* and DEVELOPMENT_* variables
       acc[`import.meta.env.${key}`] = JSON.stringify(val)
       return acc
     },
-    {}
+    {} as Record<string, string>
   )
   
   return {
