@@ -699,12 +699,12 @@ export function HECSCalculator() {
                                   <Text size={isMobile ? 'md' : 'lg'} c="dimmed">Total Repayments</Text>
                                   <Text fw={700} size={isMobile ? 'lg' : 'xl'}>{formatCurrency(result.totalRepayments)}</Text>
                                 </Grid.Col>
-                                {result.oneOffCutAmount && result.oneOffCutAmount > 0 && (
+                                {(result.oneOffCutAmount && result.oneOffCutAmount > 0) ? (
                                   <Grid.Col span={12}>
                                     <Text size={isMobile ? 'md' : 'lg'} c="green">One-off Debt Reduction (20%)</Text>
                                     <Text fw={700} size={isMobile ? 'lg' : 'xl'} c="green">-{formatCurrency(result.oneOffCutAmount)}</Text>
                                   </Grid.Col>
-                                )}
+                                ) : null}
                                 <Grid.Col span={12}>
                                   <Text size={isMobile ? 'md' : 'lg'} c="dimmed">Next Year's Balance (with Indexation)</Text>
                                   <Text fw={700} size={isMobile ? 'lg' : 'xl'}>{formatCurrency(result.totalWithIndexation)}</Text>
