@@ -13,6 +13,8 @@ A modern, interactive web application that helps Australian students and graduat
 - 💸 Voluntary repayment planning
 - 📱 Fully responsive design for all devices
 - 🎯 Advanced options for salary growth projections
+- 🔄 CI/CD integration for automated deployments
+- 🔒 Branch protection rules for code quality
 
 ## Live Demo
 
