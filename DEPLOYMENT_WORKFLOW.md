@@ -115,6 +115,33 @@ If a deployment fails:
 4. Push the fix to the appropriate branch
 5. The deployment will automatically retry
 
+## GitHub Actions Permissions
+
+Our GitHub Actions workflows have specific permissions configured to ensure they can perform necessary deployment operations:
+
+### Production Workflow
+The production deployment workflow has these permissions:
+- `contents: read` - For reading repository content
+- `deployments: write` - For creating deployments
+- `statuses: write` - For updating commit statuses
+
+### Development Workflow
+The development deployment workflow has similar permissions:
+- `contents: read` - For reading repository content
+- `deployments: write` - For creating deployments 
+- `statuses: write` - For updating commit statuses
+
+### CI Workflow
+The CI workflow used for pull requests has:
+- `contents: read` - For reading repository content
+- `pull-requests: read` - For accessing pull request information
+
+If deployment issues occur with "Resource not accessible by integration" errors, check:
+1. Workflow permissions in the YAML files
+2. Repository secrets configuration
+3. Vercel token permissions and expiration
+4. GitHub Actions permissions settings in the repository settings
+
 ## Environment Variables
 
 - Environment variables are managed in the Vercel dashboard

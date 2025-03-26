@@ -6,21 +6,34 @@ on:
       - main
   workflow_dispatch:
 
+# Define permissions at workflow level
+permissions:
+  contents: read
+  deployments: write
+  statuses: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Ensure we have the full repository history
+          fetch-depth: 0
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: "npm"
+
       - name: Install dependencies
         run: npm ci
+
       - name: Run linting
         run: npm run lint
+
       - name: Deploy to Vercel (Production)
         uses: amondnet/vercel-action@v25
         with:
@@ -29,3 +42,4 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-args: "--prod"
+          working-directory: ./
