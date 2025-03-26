@@ -17,6 +17,7 @@ export interface CalculatorInput {
   expected_salary_increase: number;
   voluntary_payment_year?: number | null;
   voluntary_payment_amount?: number | null;
+  apply_one_off_cut?: boolean;
   years_to_repay: number;
   total_interest: number;
   total_repayments: number;

@@ -3,7 +3,7 @@ import {
   Button, Paper, Title, Stack, NumberInput, Box, Text, Grid, 
   Tooltip, ThemeIcon, Divider, Timeline, LoadingOverlay,
   Card, Group, Container, ActionIcon, Collapse, Transition,
-  Notification
+  Notification, Checkbox
 } from '@mantine/core';
 import { useMediaQuery, useViewportSize } from '@mantine/hooks';
 import { useState } from 'react';
@@ -27,6 +27,7 @@ interface CalculationResult {
   projectionMilestones: ProjectionMilestone[];
   totalInterestPaid: number;
   totalRepayments: number;
+  oneOffCutAmount?: number;
 }
 
 interface YearlyData {
@@ -44,6 +45,7 @@ interface ProjectionMilestone {
 }
 
 const INDEXATION_RATE = 4.0; // Current indexation rate for 2024
+const ONE_OFF_CUT_RATE = 20.0; // One-off HECS debt reduction rate (20%)
 
 interface TooltipProps {
   active?: boolean;
@@ -91,6 +93,7 @@ interface FormValues {
   expectedSalaryIncrease: number;
   voluntaryPaymentYear: number | '';
   voluntaryPaymentAmount: string;
+  applyOneOffCut: boolean;
 }
 
 export function HECSCalculator() {
@@ -114,6 +117,7 @@ export function HECSCalculator() {
       expectedSalaryIncrease: 3,
       voluntaryPaymentYear: '',
       voluntaryPaymentAmount: '',
+      applyOneOffCut: false,
     },
     validate: {
       currentDebt: (value) => {
@@ -155,23 +159,23 @@ export function HECSCalculator() {
 
   const calculateRepaymentRate = (income: number): number => {
     if (income < 54435) return 0;
-    if (income < 62851) return 1.0;
-    if (income < 66621) return 2.0;
-    if (income < 70619) return 2.5;
-    if (income < 74856) return 3.0;
-    if (income < 79347) return 3.5;
-    if (income < 84108) return 4.0;
-    if (income < 89155) return 4.5;
-    if (income < 94504) return 5.0;
-    if (income < 100175) return 5.5;
-    if (income < 106186) return 6.0;
-    if (income < 112557) return 6.5;
-    if (income < 119310) return 7.0;
-    if (income < 126468) return 7.5;
-    if (income < 134057) return 8.0;
-    if (income < 142101) return 8.5;
-    if (income < 150627) return 9.0;
-    if (income < 159664) return 9.5;
+    if (income <= 62850) return 1.0;
+    if (income <= 66620) return 2.0;
+    if (income <= 70618) return 2.5;
+    if (income <= 74855) return 3.0;
+    if (income <= 79346) return 3.5;
+    if (income <= 84107) return 4.0;
+    if (income <= 89154) return 4.5;
+    if (income <= 94503) return 5.0;
+    if (income <= 100174) return 5.5;
+    if (income <= 106185) return 6.0;
+    if (income <= 112556) return 6.5;
+    if (income <= 119309) return 7.0;
+    if (income <= 126467) return 7.5;
+    if (income <= 134056) return 8.0;
+    if (income <= 142100) return 8.5;
+    if (income <= 150626) return 9.0;
+    if (income <= 159663) return 9.5;
     return 10.0;
   };
 
@@ -185,9 +189,26 @@ export function HECSCalculator() {
     const indexationRate = Number(INDEXATION_RATE);
     const voluntaryPaymentYear = Number(form.values.voluntaryPaymentYear) || -1;
     const voluntaryPaymentAmount = Number(form.values.voluntaryPaymentAmount) || 0;
+    const applyOneOffCut = form.values.applyOneOffCut;
     
     // Initialize calculation variables
     let remainingDebt = currentDebtValue;
+    
+    // Apply one-off cut if enabled (at the beginning before any repayments)
+    let oneOffCutAmount = 0;
+    if (applyOneOffCut && remainingDebt > 0) {
+      oneOffCutAmount = (remainingDebt * ONE_OFF_CUT_RATE) / 100;
+      remainingDebt -= oneOffCutAmount;
+      
+      // Add one-off cut milestone
+      projectionMilestones.push({
+        year: 0,
+        description: `One-off 20% debt reduction applied: ${formatCurrency(oneOffCutAmount)} reduced`,
+        type: 'success',
+        value: remainingDebt,
+      });
+    }
+    
     let currentIncome = income;
     let years = 0;
     let totalInterestPaid = 0;
@@ -291,7 +312,7 @@ export function HECSCalculator() {
       });
     }
 
-    const totalWithIndexation = (Number(form.values.currentDebt) || 0) * (1 + INDEXATION_RATE / 100);
+    const totalWithIndexation = remainingDebt * (1 + INDEXATION_RATE / 100);
 
     return {
       repaymentRate: initialRepaymentRate,
@@ -303,6 +324,7 @@ export function HECSCalculator() {
       projectionMilestones,
       totalInterestPaid,
       totalRepayments,
+      oneOffCutAmount,
     };
   };
 
@@ -314,6 +336,7 @@ export function HECSCalculator() {
         expected_salary_increase: values.expectedSalaryIncrease,
         voluntary_payment_year: values.voluntaryPaymentYear || null,
         voluntary_payment_amount: values.voluntaryPaymentAmount ? Number(values.voluntaryPaymentAmount) : null,
+        apply_one_off_cut: values.applyOneOffCut,
         years_to_repay: result.yearsToRepay,
         total_interest: result.totalInterestPaid,
         total_repayments: result.totalRepayments
@@ -395,6 +418,9 @@ export function HECSCalculator() {
               <Title order={1} size={isMobile ? 'h2' : 'h1'}>HECS Debt Calculator</Title>
               <Text c="dimmed" size={isMobile ? 'md' : 'lg'} mt="xs" maw={600} mx="auto">
               Plan your future with confidence using our comprehensive HECS-HELP loan calculator. Easily estimate your repayments, see important milestones, and gain a clear understanding of your student debt journey. Please note, all results are estimates and should not be considered financial advice.
+              </Text>
+              <Text c="blue" size={isMobile ? 'sm' : 'md'} mt="xs" fw={500} maw={600} mx="auto">
+                Updated for 2024-25 with latest repayment thresholds and the new one-off 20% debt reduction policy.
               </Text>
             </Box>
 
@@ -570,6 +596,28 @@ export function HECSCalculator() {
                               {...form.getInputProps('expectedSalaryIncrease')}
                               rightSection={<IconPercentage size={16} />}
                             />
+                            
+                            <Group gap="xs" align="flex-start">
+                              <Checkbox
+                                {...form.getInputProps('applyOneOffCut', { type: 'checkbox' })}
+                                size={isMobile ? 'sm' : 'md'}
+                              />
+                              <div>
+                                <Text fw={500} size={isMobile ? 'sm' : 'md'}>Apply 20% one-off debt reduction</Text>
+                                <Text size="xs" c="dimmed">
+                                  Simulates the effect of the 20% one-off reduction to your HECS debt announced in recent policy changes
+                                </Text>
+                              </div>
+                              <Tooltip
+                                label="This simulates the government's one-off debt reduction policy which reduces eligible student debt by 20%"
+                                position={isMobile ? "bottom" : "right"}
+                                multiline
+                                maw={300}
+                                withArrow
+                              >
+                                <IconInfoCircle size={16} style={{ cursor: 'help' }} />
+                              </Tooltip>
+                            </Group>
                           </Stack>
                         </Collapse>
                       </Box>
@@ -643,6 +691,12 @@ export function HECSCalculator() {
                                   <Text size={isMobile ? 'md' : 'lg'} c="dimmed">Total Repayments</Text>
                                   <Text fw={700} size={isMobile ? 'lg' : 'xl'}>{formatCurrency(result.totalRepayments)}</Text>
                                 </Grid.Col>
+                                {result.oneOffCutAmount && result.oneOffCutAmount > 0 && (
+                                  <Grid.Col span={12}>
+                                    <Text size={isMobile ? 'md' : 'lg'} c="green">One-off Debt Reduction (20%)</Text>
+                                    <Text fw={700} size={isMobile ? 'lg' : 'xl'} c="green">-{formatCurrency(result.oneOffCutAmount)}</Text>
+                                  </Grid.Col>
+                                )}
                                 <Grid.Col span={12}>
                                   <Text size={isMobile ? 'md' : 'lg'} c="dimmed">Next Year's Balance (with Indexation)</Text>
                                   <Text fw={700} size={isMobile ? 'lg' : 'xl'}>{formatCurrency(result.totalWithIndexation)}</Text>
