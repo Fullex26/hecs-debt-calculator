@@ -126,6 +126,9 @@ The production deployment workflow has these permissions:
 - `statuses: write` - For updating commit statuses
 - `issues: write` - For commenting on issues
 - `pull-requests: write` - For commenting on PRs with deployment information
+- `checks: write` - For creating check runs
+- `actions: read` - For reading workflow information
+- `discussions: write` - For commenting on discussions
 
 ### Development Workflow
 The development deployment workflow has similar permissions:
@@ -134,6 +137,9 @@ The development deployment workflow has similar permissions:
 - `statuses: write` - For updating commit statuses
 - `issues: write` - For commenting on issues
 - `pull-requests: write` - For commenting on PRs with deployment information
+- `checks: write` - For creating check runs
+- `actions: read` - For reading workflow information
+- `discussions: write` - For commenting on discussions
 
 ### CI Workflow
 The CI workflow used for pull requests has:
