@@ -6,16 +6,17 @@ on:
       - main
   workflow_dispatch:
 
-# Define permissions at workflow level
+# Define permissions at workflow level with enhanced access
 permissions:
-  contents: read
+  contents: write # Upgraded from read to write
   deployments: write
   statuses: write
   issues: write
   pull-requests: write
-  checks: write # For creating check runs
-  actions: read # For reading workflow info
-  discussions: write # For commenting on discussions if needed
+  checks: write
+  actions: write # Upgraded from read to write
+  discussions: write
+  security-events: write # Added for security scanning
 
 jobs:
   deploy:
