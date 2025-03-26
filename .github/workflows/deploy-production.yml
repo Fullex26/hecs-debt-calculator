@@ -21,6 +21,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: read
+      deployments: write
+      statuses: write
+      pull-requests: write
+      issues: write
     steps:
       - uses: actions/checkout@v4
         with:

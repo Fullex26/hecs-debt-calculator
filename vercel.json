@@ -13,14 +13,5 @@
       "main": true,
       "development": true
     }
-  },
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/node",
-      "config": {
-        "buildCommand": "npm run build:prod"
-      }
-    }
-  ]
+  }
 } 
