@@ -219,7 +219,17 @@ export function HECSCalculator() {
     const initialDebt = currentDebtValue;
     const initialRepaymentRate = calculateRepaymentRate(income);
     const initialAnnualRepayment = (income * initialRepaymentRate) / 100;
-
+    const initialYearIndexation = (currentDebtValue * indexationRate) / 100;
+    
+    // Apply one-off cut to initial calculation if enabled
+    let adjustedInitialDebt = currentDebtValue;
+    if (applyOneOffCut) {
+      adjustedInitialDebt -= (currentDebtValue * ONE_OFF_CUT_RATE) / 100;
+    }
+    
+    // Next year's balance = current debt (after one-off cut if applied) + indexation - first year repayment
+    const totalWithIndexation = Math.max(0, adjustedInitialDebt + initialYearIndexation - initialAnnualRepayment);
+    
     // Add initial milestone
     projectionMilestones.push({
       year: 0,
@@ -311,8 +321,6 @@ export function HECSCalculator() {
         value: remainingDebt,
       });
     }
-
-    const totalWithIndexation = remainingDebt * (1 + INDEXATION_RATE / 100);
 
     return {
       repaymentRate: initialRepaymentRate,
