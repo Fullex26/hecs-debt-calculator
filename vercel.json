@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build:prod",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "vite",
@@ -13,5 +13,14 @@
       "main": true,
       "development": true
     }
-  }
+  },
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node",
+      "config": {
+        "buildCommand": "npm run build:prod"
+      }
+    }
+  ]
 } 
