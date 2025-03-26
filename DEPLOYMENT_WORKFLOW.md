@@ -124,12 +124,16 @@ The production deployment workflow has these permissions:
 - `contents: read` - For reading repository content
 - `deployments: write` - For creating deployments
 - `statuses: write` - For updating commit statuses
+- `issues: write` - For commenting on issues
+- `pull-requests: write` - For commenting on PRs with deployment information
 
 ### Development Workflow
 The development deployment workflow has similar permissions:
 - `contents: read` - For reading repository content
 - `deployments: write` - For creating deployments 
 - `statuses: write` - For updating commit statuses
+- `issues: write` - For commenting on issues
+- `pull-requests: write` - For commenting on PRs with deployment information
 
 ### CI Workflow
 The CI workflow used for pull requests has:
