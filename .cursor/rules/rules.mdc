@@ -1,0 +1,24 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Branch Structure - Always create feature branches from development and follow the workflow: Feature Branch → Development → Main for all code changes.
+
+Pull Request Requirements - PRs must include clear descriptions, pass all GitHub Actions checks, and receive at least one code review approval before merging.
+
+Environment Variables - Never commit sensitive values to the repository; manage different configurations for development and production in Vercel dashboard.
+
+Testing Protocol - Verify all changes on the Staging environment before creating a PR to merge from development to main for production deployment.
+
+Hotfix Procedure - When fixing critical issues, create hotfix branches from main, then merge to both main and development to ensure fix is included in all environments.
+
+TypeScript Standards - Maintain proper TypeScript typings in all files including configuration files to ensure type safety throughout the codebase.
+
+Component Structure - Follow the established pattern for React components, using Mantine UI for consistent styling and @mantine/form for form handling.
+
+Deployment Verification - After each production deployment, verify functionality on the live site and immediately address any issues following the rollback procedure.
+
+GitHub Actions Permissions - Ensure workflows have appropriate permissions configured as documented in DEPLOYMENT_WORKFLOW.md to prevent "Resource not accessible by integration" errors.
+
+Documentation Updates - When adding features or changing functionality, update relevant documentation to maintain consistency between code and documentation.
